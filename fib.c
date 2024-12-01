@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
     if (!strcmp(argv[2], "i")) {
         printf("%lu\n", memoize(fib_i_core, number_to_fib));
     } else if (!strcmp(argv[2], "r")) {
-        printf("%lu\n", memoize(fib_r, number_to_fib));
+        printf("%lu\n", fib_r(number_to_fib));
     } else {
         perror("Choose between i or r in argv[2]\n");
         exit(1);
