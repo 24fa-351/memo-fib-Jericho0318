@@ -2,22 +2,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <stdint.h>
 
-unsigned long long int fib_r_core(int fibIndex)
+uint64_t fib_r_core(int fibIndex)
 {
     if (fibIndex == 0 || fibIndex == 1) {return 0;}
     if (fibIndex == 2) {return 1;}
-    if (fib_r_core(fibIndex - 1) > ULLONG_MAX - fib_r_core(fibIndex - 2))
+    else {
+        if (fib_r_core(fibIndex - 1) > ULLONG_MAX - fib_r_core(fibIndex - 2))
         {
-            printf("Error: overflow\nMax value: %llu\n", fib_r_core(fibIndex - 1));
-            return 1;
+            printf("Error: overflow\nMax value: %lu\n", fib_r_core(fibIndex - 1));
+            exit(1);
         }
+    }
     return fib_r_core(fibIndex - 1) + fib_r_core(fibIndex - 2);
 }
 
-unsigned long long int fib_i_core(int fibIndex)
+uint64_t fib_i_core(int fibIndex)
 {
-    unsigned long long int first = 0, second = 1, sum = 0;
+    uint64_t first = 0, second = 1, sum = 0;
     if (fibIndex == 0) {return 0;}
     if (fibIndex == 1 || fibIndex == 2) {return 0;}
     else
@@ -26,8 +29,8 @@ unsigned long long int fib_i_core(int fibIndex)
         {
             if (second > ULLONG_MAX - first)
             {
-                printf("Error: overflow\nMax value: %llu\n", second);
-                return 1;
+                printf("Error: overflow\nMax value: %lu\n", second);
+                exit(1);
             }
             sum = first + second;
             first = second;
@@ -37,13 +40,13 @@ unsigned long long int fib_i_core(int fibIndex)
     return sum;
 }
 
-typedef unsigned long long int (*fib_func)(int);
+typedef uint64_t (*fib_func)(int);
 
-unsigned long long int *memcache = NULL;
+uint64_t *memcache = NULL;
 
-unsigned long long int memoize(fib_func func, unsigned long long int fibIndex) {
+uint64_t memoize(fib_func func, uint64_t fibIndex) {
     if (memcache == NULL) {
-        memcache = (unsigned long long int*)malloc((fibIndex + 1) * sizeof(unsigned long long int));
+        memcache = (uint64_t*)malloc((fibIndex + 1) * sizeof(uint64_t));
         for (int i = 0; i <= fibIndex; i++) {
             memcache[i] = -1;
         }
@@ -56,15 +59,15 @@ unsigned long long int memoize(fib_func func, unsigned long long int fibIndex) {
     return memcache[fibIndex];
 }
 
-unsigned long long int fib_r(int fibIndex) {
+uint64_t fib_r(int fibIndex) {
     if (fibIndex == 0 || fibIndex == 1) {return 0;}
     if (fibIndex == 2) {return 1;}
     else 
     {
         if (memoize(fib_r, fibIndex - 1) > ULLONG_MAX - memoize(fib_r, fibIndex - 2))
         {
-            printf("Error: overflow\nMax value: %llu\n", fib_r(fibIndex - 1));
-            return 1;
+            printf("Error: overflow\nMax value: %lu\n", fib_r(fibIndex - 1));
+            exit(1);
         }
         return memoize(fib_r, fibIndex - 1) + memoize(fib_r, fibIndex - 2);
     }
@@ -74,15 +77,18 @@ unsigned long long int fib_r(int fibIndex) {
 int main(int argc, char *argv[]) {
     if (argc < 3) {
         printf("./fib <number> <r or i>\n");
-        return 1;
+        exit(1);
     }
 
-    unsigned long long int number_to_fib = atoi(argv[1]);
+    uint64_t number_to_fib = atoi(argv[1]);
 
     if (!strcmp(argv[2], "i")) {
-        printf("%llu\n", memoize(fib_i_core, number_to_fib));
+        printf("%lu\n", memoize(fib_i_core, number_to_fib));
     } else if (!strcmp(argv[2], "r")) {
-        printf("%llu\n", memoize(fib_r, number_to_fib));
+        printf("%lu\n", memoize(fib_r, number_to_fib));
+    } else {
+        perror("Choose between i or r in argv[2]\n");
+        exit(1);
     }
 
     free(memcache);
