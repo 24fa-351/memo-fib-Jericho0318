@@ -4,28 +4,28 @@
 #include <limits.h>
 #include <stdint.h>
 
-uint64_t fib_r_core(int fibIndex)
+uint64_t fib_r_core(int num_to_fib)
 {
-    if (fibIndex == 0 || fibIndex == 1) {return 0;}
-    if (fibIndex == 2) {return 1;}
+    if (num_to_fib == 0 || num_to_fib == 1) {return 0;}
+    if (num_to_fib == 2) {return 1;}
     else {
-        if (fib_r_core(fibIndex - 1) > ULLONG_MAX - fib_r_core(fibIndex - 2))
+        if (fib_r_core(num_to_fib - 1) > ULLONG_MAX - fib_r_core(num_to_fib - 2))
         {
-            printf("Error: overflow\nMax value: %lu\n", fib_r_core(fibIndex - 1));
+            printf("Error: overflow\nMax value: %lu\n", fib_r_core(num_to_fib - 1));
             exit(1);
         }
     }
-    return fib_r_core(fibIndex - 1) + fib_r_core(fibIndex - 2);
+    return fib_r_core(num_to_fib - 1) + fib_r_core(num_to_fib - 2);
 }
 
-uint64_t fib_i_core(int fibIndex)
+uint64_t fib_i_core(int num_to_fib)
 {
     uint64_t first = 0, second = 1, sum = 0;
-    if (fibIndex == 0) {return 0;}
-    if (fibIndex == 1 || fibIndex == 2) {return 0;}
+    if (num_to_fib == 0) {return 0;}
+    if (num_to_fib == 1 || num_to_fib == 2) {return 0;}
     else
     {
-        for (int i = 2; i < fibIndex; ++i)
+        for (int i = 2; i < num_to_fib; ++i)
         {
             if (second > ULLONG_MAX - first)
             {
@@ -44,32 +44,32 @@ typedef uint64_t (*fib_func)(int);
 
 uint64_t *memcache = NULL;
 
-uint64_t memoize(fib_func func, uint64_t fibIndex) {
+uint64_t memoize(fib_func func, uint64_t num_to_fib) {
     if (memcache == NULL) {
-        memcache = (uint64_t*)malloc((fibIndex + 1) * sizeof(uint64_t));
-        for (int i = 0; i <= fibIndex; i++) {
-            memcache[i] = -1;
+        memcache = (uint64_t*)malloc((num_to_fib + 1) * sizeof(uint64_t));
+        for (int ix = 0; ix <= num_to_fib; ix++) {
+            memcache[ix] = -1;
         }
     }
 
-    if (memcache[fibIndex] == -1) {
-        memcache[fibIndex] = func(fibIndex);
+    if (memcache[num_to_fib] == -1) {
+        memcache[num_to_fib] = func(num_to_fib);
     }
 
-    return memcache[fibIndex];
+    return memcache[num_to_fib];
 }
 
-uint64_t fib_r(int fibIndex) {
-    if (fibIndex == 0 || fibIndex == 1) {return 0;}
-    if (fibIndex == 2) {return 1;}
+uint64_t fib_r(int num_to_fib) {
+    if (num_to_fib == 0 || num_to_fib == 1) {return 0;}
+    if (num_to_fib == 2) {return 1;}
     else 
     {
-        if (memoize(fib_r, fibIndex - 1) > ULLONG_MAX - memoize(fib_r, fibIndex - 2))
+        if (memoize(fib_r, num_to_fib - 1) > ULLONG_MAX - memoize(fib_r, num_to_fib - 2))
         {
-            printf("Error: overflow\nMax value: %lu\n", fib_r(fibIndex - 1));
+            printf("Error: overflow\nMax value: %lu\n", fib_r(num_to_fib - 1));
             exit(1);
         }
-        return memoize(fib_r, fibIndex - 1) + memoize(fib_r, fibIndex - 2);
+        return memoize(fib_r, num_to_fib - 1) + memoize(fib_r, num_to_fib - 2);
     }
 }
 
